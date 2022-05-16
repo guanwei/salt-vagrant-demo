@@ -5,31 +5,31 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  os = "generic/ubuntu2004"
+  os = "bento/centos-7"
   net_ip = "192.168.56"
 
-  config.vm.define :master, primary: true do |master_config|
+  config.vm.define "salt-master", primary: true do |master_config|
     master_config.vm.provider "virtualbox" do |vb|
-        vb.memory = "2048"
-        vb.cpus = 1
-        vb.name = "master"
+      vb.memory = "512"
+      vb.cpus = 1
+      vb.name = "salt-master"
     end
 
     master_config.vm.box = "#{os}"
-    master_config.vm.host_name = 'saltmaster.local'
-    master_config.vm.network "private_network", ip: "#{net_ip}.10"
+    master_config.vm.hostname = 'salt-master'
+    master_config.vm.network "private_network", ip: "#{net_ip}.20"
     master_config.vm.synced_folder "saltstack/salt/", "/srv/salt"
     master_config.vm.synced_folder "saltstack/pillar/", "/srv/pillar"
 
     master_config.vm.provision :salt do |salt|
-      salt.master_config = "saltstack/etc/master"
-      salt.master_key = "saltstack/keys/master_minion.pem"
-      salt.master_pub = "saltstack/keys/master_minion.pub"
-      salt.minion_key = "saltstack/keys/master_minion.pem"
-      salt.minion_pub = "saltstack/keys/master_minion.pub"
+      salt.master_config = "saltstack/etc/salt-master"
+      salt.master_key = "saltstack/keys/salt-master.pem"
+      salt.master_pub = "saltstack/keys/salt-master.pub"
+      salt.minion_key = "saltstack/keys/salt-master.pem"
+      salt.minion_pub = "saltstack/keys/salt-master.pub"
       salt.seed_master = {
-                          "minion1" => "saltstack/keys/minion1.pub",
-                          "minion2" => "saltstack/keys/minion2.pub"
+                          "salt-minion1" => "saltstack/keys/salt-minion1.pub",
+                          "salt-minion2" => "saltstack/keys/salt-minion2.pub"
                          }
 
       salt.install_type = "stable"
@@ -43,14 +43,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
   [
-    ["minion1",    "#{net_ip}.11",    "1024",    os ],
-    ["minion2",    "#{net_ip}.12",    "1024",    os ],
+    ["salt-minion1",    "#{net_ip}.21",    "512",    os ],
+    ["salt-minion2",    "#{net_ip}.22",    "512",    os ],
   ].each do |vmname,ip,mem,os|
     config.vm.define "#{vmname}" do |minion_config|
       minion_config.vm.provider "virtualbox" do |vb|
-          vb.memory = "#{mem}"
-          vb.cpus = 1
-          vb.name = "#{vmname}"
+        vb.memory = "#{mem}"
+        vb.cpus = 1
+        vb.name = "#{vmname}"
       end
 
       minion_config.vm.box = "#{os}"
