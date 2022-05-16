@@ -32,4 +32,4 @@ using Salt.
 .. code-block:: bash
 
     vagrant ssh salt-master
-    sudo salt \* test.ping
+    sudo salt '*' test.ping
