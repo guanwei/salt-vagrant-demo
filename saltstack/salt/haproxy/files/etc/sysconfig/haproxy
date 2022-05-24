@@ -1,0 +1,8 @@
+# Add extra options to the haproxy daemon here. This can be useful for
+# specifying multiple configuration files with multiple -f options.
+# See haproxy(1) for a complete list of options.
+
+# Set ENABLED to 1 if you want the init script to start haproxy.
+ENABLED=1
+# Add extra flags here.
+#EXTRAOPTS="-de -m 16"
